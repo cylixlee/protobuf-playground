@@ -121,7 +121,7 @@ const file_hello_proto_rawDesc = "" +
 	"\rHelloResponse\x12\x14\n" +
 	"\x05reply\x18\x01 \x01(\tR\x05reply2=\n" +
 	"\x05Hello\x124\n" +
-	"\x05Hello\x12\x13.proto.HelloRequest\x1a\x14.proto.HelloResponse\"\x00B/Z-github.com/cylixlee/protobuf-playground/protob\x06proto3"
+	"\x05Hello\x12\x13.proto.HelloRequest\x1a\x14.proto.HelloResponse\"\x00B8Z6github.com/cylixlee/protobuf-playground/internal/protob\x06proto3"
 
 var (
 	file_hello_proto_rawDescOnce sync.Once

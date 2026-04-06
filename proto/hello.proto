@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package proto;
 
-option go_package = "github.com/cylixlee/protobuf-playground/proto";
+option go_package = "github.com/cylixlee/protobuf-playground/internal/proto";
 
 // Simple hello service
 service Hello {

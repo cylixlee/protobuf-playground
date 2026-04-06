@@ -6,13 +6,13 @@ from google.protobuf import symbol_database as _symbol_database
 from google.protobuf.internal import builder as _builder
 _runtime_version.ValidateProtobufRuntimeVersion(_runtime_version.Domain.PUBLIC, 5, 29, 0, '', 'hello.proto')
 _sym_db = _symbol_database.Default()
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0bhello.proto\x12\x05proto"\x1c\n\x0cHelloRequest\x12\x0c\n\x04name\x18\x01 \x01(\t"\x1e\n\rHelloResponse\x12\r\n\x05reply\x18\x01 \x01(\t2=\n\x05Hello\x124\n\x05Hello\x12\x13.proto.HelloRequest\x1a\x14.proto.HelloResponse"\x00B/Z-github.com/cylixlee/protobuf-playground/protob\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0bhello.proto\x12\x05proto"\x1c\n\x0cHelloRequest\x12\x0c\n\x04name\x18\x01 \x01(\t"\x1e\n\rHelloResponse\x12\r\n\x05reply\x18\x01 \x01(\t2=\n\x05Hello\x124\n\x05Hello\x12\x13.proto.HelloRequest\x1a\x14.proto.HelloResponse"\x00B8Z6github.com/cylixlee/protobuf-playground/internal/protob\x06proto3')
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'hello_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
     _globals['DESCRIPTOR']._loaded_options = None
-    _globals['DESCRIPTOR']._serialized_options = b'Z-github.com/cylixlee/protobuf-playground/proto'
+    _globals['DESCRIPTOR']._serialized_options = b'Z6github.com/cylixlee/protobuf-playground/internal/proto'
     _globals['_HELLOREQUEST']._serialized_start = 22
     _globals['_HELLOREQUEST']._serialized_end = 50
     _globals['_HELLORESPONSE']._serialized_start = 52

@@ -43,19 +43,23 @@ tasks:
   proto-go:
     desc: Compile Protobuf/gRPC into Go stub code.
     internal: true
+    shopt:
+      - globstar
     cmds:
       - mkdir -p go/internal
       - |
-        protoc -Iproto --go_out=go/internal                                 \
+        protoc -Iproto --go_out=go                                          \
                --go_opt=module=github.com/cylixlee/protobuf-playground      \
-               --go-grpc_out=go/internal                                    \
+               --go-grpc_out=go                                             \
                --go-grpc_opt=module=github.com/cylixlee/protobuf-playground \
-        proto/*.proto
+        proto/**/*.proto
     silent: true
 
   proto-py:
     desc: Compile Protobuf/gRPC into Python stub code.
     internal: true
+    shopt:
+      - globstar
     cmds:
       - mkdir -p python/generated
       - |
@@ -64,9 +68,9 @@ tasks:
            --python_out=python/generated             \
            --pyi_out=python/generated                \
            --grpc_python_out=python/generated        \
-        proto/*.proto
+        proto/**/*.proto
       - |
-        for proto in proto/*.proto; do
+        for proto in proto/**/*.proto; do
           uv --project python run protol   \
              --create-package              \
              --in-place                    \

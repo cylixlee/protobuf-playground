@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "github.com/cylixlee/protobuf-playground/internal/proto";
+
+import "hello.proto";
+import "author/author.proto";
+
+// Book request containing the title and price of the book to buy.
+message BookRequest {
+  string title = 1;
+  int32 price = 2;
+  author.Author author = 3;
+}
+
+// Book response containing server reply.
+message BookResponse {
+  string reply = 1;
+}
+
+// Book service
+service Book {
+  // Say hello
+  rpc Hello(HelloRequest) returns (HelloResponse) {}
+  // Buy a book
+  rpc Buy(BookRequest) returns (BookResponse) {}
+}
