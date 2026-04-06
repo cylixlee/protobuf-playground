@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "github.com/cylixlee/protobuf-playground/proto";
+
+// Simple hello service
+service Hello {
+  // Greet the user named [HelloRequest.name]
+  rpc Hello(HelloRequest) returns (HelloResponse) {}
+}
+
+// Simple hello request containing the user name.
+message HelloRequest {
+  string name = 1;
+}
+// Simple hello response containing the reply from server.
+message HelloResponse {
+  string reply = 1;
+}

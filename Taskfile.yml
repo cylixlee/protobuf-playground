@@ -1,0 +1,44 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+
+version: "3"
+
+vars:
+  PORT: 11451
+
+tasks:
+  proto:
+    desc: Compile Protobuf/gRPC into stub code.
+    cmds:
+      - task: proto-go
+    silent: true
+
+  proto-go:
+    desc: Compile Protobuf/gRPC into Go stub code.
+    internal: true
+    cmds:
+      - mkdir -p go/internal
+      - |
+        protoc -Iproto --go_out=go/internal                                 \
+               --go_opt=module=github.com/cylixlee/protobuf-playground      \
+               --go-grpc_out=go/internal                                    \
+               --go-grpc_opt=module=github.com/cylixlee/protobuf-playground \
+        proto/*.proto
+    silent: true
+
+  server:
+    desc: Start the gRPC server
+    env:
+      PP_SERVER_PORT: "{{.PORT}}"
+    cmds:
+      - cd go && go run ./cmd/server
+    interactive: true
+    silent: true
+
+  client:
+    desc: Run the gRPC client
+    env:
+      PP_SERVER_PORT: "{{.PORT}}"
+    cmds:
+      - cd go && go run ./cmd/client
+    interactive: true
+    silent: true
