@@ -10,7 +10,6 @@ tasks:
     desc: Compile Protobuf/gRPC into stub code.
     cmds:
       - task: proto-go
-      - task: proto-py
     silent: true
 
   server:
@@ -18,7 +17,7 @@ tasks:
     env:
       PP_SERVER_PORT: "{{.PORT}}"
     cmds:
-      - cd go && go run ./cmd/server
+      - go run ./cmd/server
     interactive: true
     silent: true
 
@@ -27,16 +26,7 @@ tasks:
     env:
       PP_SERVER_PORT: "{{.PORT}}"
     cmds:
-      - cd go && go run ./cmd/client
-    interactive: true
-    silent: true
-
-  client-py:
-    desc: Run the gRPC client (Python)
-    env:
-      PP_SERVER_PORT: "{{.PORT}}"
-    cmds:
-      - uv --project python --directory python run --frozen main.py
+      - go run ./cmd/client
     interactive: true
     silent: true
 
@@ -46,37 +36,11 @@ tasks:
     shopt:
       - globstar
     cmds:
-      - mkdir -p go/internal
+      - mkdir -p internal
       - |
-        protoc -Iproto --go_out=go                                          \
+        protoc -Iproto --go_out=.                                          \
                --go_opt=module=github.com/cylixlee/protobuf-playground      \
-               --go-grpc_out=go                                             \
+               --go-grpc_out=.                                             \
                --go-grpc_opt=module=github.com/cylixlee/protobuf-playground \
         proto/**/*.proto
-    silent: true
-
-  proto-py:
-    desc: Compile Protobuf/gRPC into Python stub code.
-    internal: true
-    shopt:
-      - globstar
-    cmds:
-      - mkdir -p python/generated
-      - |
-        uv --project python run -m grpc_tools.protoc \
-           -Iproto                                   \
-           --python_out=python/generated             \
-           --pyi_out=python/generated                \
-           --grpc_python_out=python/generated        \
-        proto/**/*.proto
-      - |
-        for proto in proto/**/*.proto; do
-          uv --project python run protol   \
-             --create-package              \
-             --in-place                    \
-             --python-out python/generated \
-             protoc                        \
-             --proto-path proto            \
-          $proto
-        done
     silent: true
