@@ -27,6 +27,7 @@ var (
 	outboundIPString string
 	port             int
 	portString       string
+	serviceID        string
 )
 
 func init() {
@@ -49,6 +50,9 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
+
+	// Init service ID
+	serviceID = fmt.Sprintf("%s-%s-%d", serviceName, outboundIPString, port)
 }
 
 func main() {
@@ -74,10 +78,10 @@ func main() {
 		GRPC:                           fmt.Sprintf("%s:%d", outboundIP, port),
 		Timeout:                        "5s",
 		Interval:                       "5s",
-		DeregisterCriticalServiceAfter: "10s",
+		DeregisterCriticalServiceAfter: "1m",
 	}
 	consulReg := &consul.AgentServiceRegistration{
-		ID:      fmt.Sprintf("%s-%s-%d", serviceName, outboundIPString, port),
+		ID:      serviceID,
 		Name:    serviceName,
 		Address: outboundIPString,
 		Port:    port,
@@ -88,6 +92,7 @@ func main() {
 	graceful.New(s.Serve).
 		AddParams(l).
 		Defer(s.GracefulStop).
+		Defer(consulClient.Agent().ServiceDeregister, serviceID).
 		Defer(fmt.Println, "Gracefully shutting down...").
 		Run()
 }
