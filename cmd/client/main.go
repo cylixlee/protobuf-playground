@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/cylixlee/protobuf-playground/internal/proto"
+	consul "github.com/hashicorp/consul/api"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -17,8 +18,23 @@ func main() {
 		return
 	}
 
-	port := os.Getenv("PLAYGROUND_PORT")
-	c, err := grpc.NewClient(fmt.Sprintf("localhost:%s", port), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	consulClient, err := consul.NewClient(consul.DefaultConfig())
+	if err != nil {
+		log.Fatalln(err)
+	}
+	serviceMap, err := consulClient.Agent().ServicesWithFilter("Service==`hello`")
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	var addr string
+	for k, v := range serviceMap {
+		fmt.Println("Found service: ", k)
+		addr = fmt.Sprintf("%s:%d", v.Address, v.Port)
+	}
+	fmt.Println("Choose", addr)
+
+	c, err := grpc.NewClient(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalln(err)
 	}

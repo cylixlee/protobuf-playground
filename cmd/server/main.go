@@ -37,7 +37,7 @@ func init() {
 	}
 	defer conn.Close()
 	outboundIP = conn.LocalAddr().(*net.UDPAddr).IP
-	segments := make([]string, 4)
+	segments := make([]string, 0, 4)
 	for _, segment := range outboundIP {
 		segments = append(segments, strconv.Itoa(int(segment)))
 	}
