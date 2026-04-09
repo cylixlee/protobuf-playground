@@ -6,9 +6,12 @@ import (
 	"log"
 	"net"
 	"os"
+	"os/signal"
 
 	"github.com/cylixlee/protobuf-playground/internal/proto"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type server struct {
@@ -22,6 +25,25 @@ func (server) Hello(_ context.Context, req *proto.HelloRequest) (*proto.HelloRes
 	return resp, nil
 }
 
+type rateLimitedServer struct {
+	proto.UnimplementedRateLimitedHelloServer
+	visitors map[string]struct{}
+}
+
+func newRateLimitedServer() *rateLimitedServer {
+	return &rateLimitedServer{
+		visitors: make(map[string]struct{}),
+	}
+}
+
+func (r *rateLimitedServer) Hello(_ context.Context, req *proto.HelloRequest) (*proto.HelloResponse, error) {
+	if _, exist := r.visitors[req.Name]; exist {
+		return nil, status.Error(codes.AlreadyExists, fmt.Sprintf("User %s already exists", req.Name))
+	}
+	r.visitors[req.Name] = struct{}{}
+	return &proto.HelloResponse{Reply: fmt.Sprintf("Hello %s", req.Name)}, nil
+}
+
 func main() {
 	port := os.Getenv("PP_SERVER_PORT")
 	l, err := net.Listen("tcp", fmt.Sprintf(":%s", port))
@@ -32,8 +54,18 @@ func main() {
 
 	s := grpc.NewServer()
 	proto.RegisterHelloServer(s, server{})
+	proto.RegisterRateLimitedHelloServer(s, newRateLimitedServer())
 
-	if err := s.Serve(l); err != nil {
-		log.Fatalln(err)
-	}
+	interruptChan := make(chan os.Signal, 1)
+	signal.Notify(interruptChan, os.Interrupt)
+
+	go func() {
+		if err := s.Serve(l); err != nil {
+			log.Fatalln(err)
+		}
+	}()
+
+	<-interruptChan
+	fmt.Println("Graceful shutting down...")
+	s.GracefulStop()
 }

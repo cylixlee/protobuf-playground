@@ -121,6 +121,8 @@ const file_hello_proto_rawDesc = "" +
 	"\rHelloResponse\x12\x14\n" +
 	"\x05reply\x18\x01 \x01(\tR\x05reply2=\n" +
 	"\x05Hello\x124\n" +
+	"\x05Hello\x12\x13.proto.HelloRequest\x1a\x14.proto.HelloResponse\"\x002H\n" +
+	"\x10RateLimitedHello\x124\n" +
 	"\x05Hello\x12\x13.proto.HelloRequest\x1a\x14.proto.HelloResponse\"\x00B8Z6github.com/cylixlee/protobuf-playground/internal/protob\x06proto3"
 
 var (
@@ -142,9 +144,11 @@ var file_hello_proto_goTypes = []any{
 }
 var file_hello_proto_depIdxs = []int32{
 	0, // 0: proto.Hello.Hello:input_type -> proto.HelloRequest
-	1, // 1: proto.Hello.Hello:output_type -> proto.HelloResponse
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
+	0, // 1: proto.RateLimitedHello.Hello:input_type -> proto.HelloRequest
+	1, // 2: proto.Hello.Hello:output_type -> proto.HelloResponse
+	1, // 3: proto.RateLimitedHello.Hello:output_type -> proto.HelloResponse
+	2, // [2:4] is the sub-list for method output_type
+	0, // [0:2] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
@@ -163,7 +167,7 @@ func file_hello_proto_init() {
 			NumEnums:      0,
 			NumMessages:   2,
 			NumExtensions: 0,
-			NumServices:   1,
+			NumServices:   2,
 		},
 		GoTypes:           file_hello_proto_goTypes,
 		DependencyIndexes: file_hello_proto_depIdxs,

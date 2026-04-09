@@ -3,6 +3,7 @@
 version: "3"
 
 vars:
+  DEFAULT_REQUEST_CONTENT: CYLIX
   PORT: 11451
 
 tasks:
@@ -21,22 +22,19 @@ tasks:
     interactive: true
     silent: true
 
-  client:
-    desc: Run the gRPC client
+  request:*:
+    desc: Request gRPC server with given content
     env:
       PP_SERVER_PORT: "{{.PORT}}"
     cmds:
-      - go run ./cmd/client
+      - go run ./cmd/client {{index .MATCH 0}}
     interactive: true
     silent: true
 
-  request:*:
-    desc: Run `client-once` with given request content
-    env:
-      PP_SERVER_PORT: "{{.PORT}}"
+  request:
+    desc: Request gRPC server with the default content
     cmds:
-      - go run ./cmd/client-once {{index .MATCH 0}}
-    interactive: true
+      - task: request:{{.DEFAULT_REQUEST_CONTENT}}
     silent: true
 
   proto-go:

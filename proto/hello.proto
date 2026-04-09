@@ -10,6 +10,14 @@ service Hello {
   rpc Hello(HelloRequest) returns (HelloResponse) {}
 }
 
+// Hello service with rate limit. Returns an error when a content is called more
+// than once.
+service RateLimitedHello {
+  // Greet the user when first called. From the second call of the same name,
+  // this RPC will only return an error.
+  rpc Hello(HelloRequest) returns (HelloResponse) {}
+}
+
 // Simple hello request containing the user name.
 message HelloRequest {
   string name = 1;

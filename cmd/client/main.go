@@ -12,6 +12,11 @@ import (
 )
 
 func main() {
+	if len(os.Args) <= 1 {
+		fmt.Fprintf(os.Stderr, "Usage: client-once <request_content>")
+		return
+	}
+
 	port := os.Getenv("PP_SERVER_PORT")
 	c, err := grpc.NewClient(fmt.Sprintf("localhost:%s", port), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
@@ -19,10 +24,19 @@ func main() {
 	}
 	defer c.Close()
 
-	service := proto.NewHelloClient(c)
-	resp, err := service.Hello(context.Background(), &proto.HelloRequest{Name: "CYLIX"})
+	helloService := proto.NewHelloClient(c)
+	resp, err := helloService.Hello(context.Background(), &proto.HelloRequest{Name: os.Args[1]})
 	if err != nil {
-		log.Fatalln(err)
+		fmt.Fprintln(os.Stderr, err)
+	} else {
+		fmt.Println(resp.Reply)
 	}
-	fmt.Println(resp.Reply)
+
+	rateLimitedHelloService := proto.NewRateLimitedHelloClient(c)
+	resp, err = rateLimitedHelloService.Hello(context.Background(), &proto.HelloRequest{Name: os.Args[1]})
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+	} else {
+		fmt.Println(resp.Reply)
+	}
 }
