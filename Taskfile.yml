@@ -5,16 +5,49 @@ version: "3"
 vars:
   DEFAULT_REQUEST_CONTENT: CYLIX
   PORT: 11451
+  CONTAINER_ENGINE:
+    sh: |
+      if command -v docker > /dev/null 2>&1; then
+        echo "docker"
+      elif command -v podman > /dev/null 2>&1; then
+        echo "podman"
+      else
+        exit 1 # No supported container engine found
+      fi
+  SHOULD_START_PODMAN:
+    sh: |
+      # {{now}}
+      if command -v podman > /dev/null 2>&1; then
+        info="$(podman machine info)"
+        info="${info##*machinestate:}"
+        info="${info%%numberofmachines*}"
+        case "$info" in
+          *Running*)
+            echo "no"
+            exit 0
+            ;;
+        esac
+      fi
+      echo "yes"
 
 tasks:
-  proto:
-    desc: Compile Protobuf/gRPC into stub code.
+  up:
+    desc: Pull up all containers needed
+    deps:
+      - start-podman
     cmds:
-      - task: proto-go
-    silent: true
+      - task: consul-up
+
+  down:
+    desc: Shut down all containers needed
+    cmds:
+      - task: consul-down
 
   server:
     desc: Start the gRPC server
+    deps:
+      - proto
+      - up
     env:
       PP_SERVER_PORT: "{{.PORT}}"
     cmds:
@@ -37,17 +70,44 @@ tasks:
       - task: request:{{.DEFAULT_REQUEST_CONTENT}}
     silent: true
 
-  proto-go:
-    desc: Compile Protobuf/gRPC into Go stub code.
+  proto:
+    desc: Compile Protobuf/gRPC into stub code.
     internal: true
     shopt:
       - globstar
+    sources:
+      - proto/**/*.proto
+    generates:
+      - internal/proto/**/*.go
     cmds:
+      - echo "Recompiling protobuf..."
       - mkdir -p internal
       - |
-        protoc -Iproto --go_out=.                                          \
+        protoc -Iproto                                                      \
+               --go_out=.                                                   \
                --go_opt=module=github.com/cylixlee/protobuf-playground      \
-               --go-grpc_out=.                                             \
+               --go-grpc_out=.                                              \
                --go-grpc_opt=module=github.com/cylixlee/protobuf-playground \
         proto/**/*.proto
+    silent: true
+
+  start-podman:
+    desc: Start podman if not running
+    internal: true
+    if: test "{{.SHOULD_START_PODMAN}}" = "yes"
+    cmd: podman machine start
+    silent: true
+
+  consul-up:
+    desc: Compose consul up in container engine
+    internal: true
+    dir: "{{.ROOT_DIR}}/consul"
+    cmd: "{{.CONTAINER_ENGINE}} compose up -d 2> /dev/null"
+    silent: true
+
+  consul-down:
+    desc: Compose consul down in container engine
+    internal: true
+    dir: "{{.ROOT_DIR}}/consul"
+    cmd: "{{.CONTAINER_ENGINE}} compose down 2> /dev/null"
     silent: true
