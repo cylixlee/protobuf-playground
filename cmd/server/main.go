@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net"
@@ -20,7 +21,9 @@ func main() {
 	}
 	defer l.Close()
 
-	s := grpc.NewServer()
+	s := grpc.NewServer(
+		grpc.UnaryInterceptor(logInterceptor),
+	)
 	proto.RegisterHelloServer(s, impl.SimpleServer{})
 	proto.RegisterRateLimitedHelloServer(s, impl.NewRateLimitedServer())
 
@@ -29,4 +32,9 @@ func main() {
 		Defer(s.GracefulStop).
 		Defer(fmt.Println, "Gracefully shutting down...").
 		Run()
+}
+
+func logInterceptor(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp any, err error) {
+	fmt.Println(info.FullMethod)
+	return handler(ctx, req)
 }
