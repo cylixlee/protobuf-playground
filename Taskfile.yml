@@ -30,6 +30,15 @@ tasks:
     interactive: true
     silent: true
 
+  request:*:
+    desc: Run `client-once` with given request content
+    env:
+      PP_SERVER_PORT: "{{.PORT}}"
+    cmds:
+      - go run ./cmd/client-once {{index .MATCH 0}}
+    interactive: true
+    silent: true
+
   proto-go:
     desc: Compile Protobuf/gRPC into Go stub code.
     internal: true
