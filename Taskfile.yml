@@ -2,9 +2,11 @@
 
 version: "3"
 
+env:
+  PLAYGROUND_PORT: 11451
+
 vars:
   DEFAULT_REQUEST_CONTENT: CYLIX
-  PORT: 11451
   CONTAINER_ENGINE:
     sh: |
       if command -v docker > /dev/null 2>&1; then
@@ -27,8 +29,8 @@ vars:
             exit 0
             ;;
         esac
+        echo "yes"
       fi
-      echo "yes"
 
 tasks:
   up:
@@ -48,8 +50,6 @@ tasks:
     deps:
       - proto
       - up
-    env:
-      PP_SERVER_PORT: "{{.PORT}}"
     cmds:
       - go run ./cmd/server
     interactive: true
@@ -57,8 +57,6 @@ tasks:
 
   request:*:
     desc: Request gRPC server with given content
-    env:
-      PP_SERVER_PORT: "{{.PORT}}"
     cmds:
       - go run ./cmd/client {{index .MATCH 0}}
     interactive: true

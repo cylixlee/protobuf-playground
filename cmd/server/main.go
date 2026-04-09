@@ -44,7 +44,7 @@ func init() {
 	outboundIPString = strings.Join(segments, ".")
 
 	// Init service port (int and string)
-	portString = os.Getenv("PP_SERVER_PORT")
+	portString = os.Getenv("PLAYGROUND_PORT")
 	port, err = strconv.Atoi(portString)
 	if err != nil {
 		panic(err)

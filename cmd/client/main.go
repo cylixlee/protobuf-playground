@@ -17,7 +17,7 @@ func main() {
 		return
 	}
 
-	port := os.Getenv("PP_SERVER_PORT")
+	port := os.Getenv("PLAYGROUND_PORT")
 	c, err := grpc.NewClient(fmt.Sprintf("localhost:%s", port), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalln(err)
