@@ -7,6 +7,7 @@ import (
 	"net"
 	"os"
 	"os/signal"
+	"sync"
 
 	"github.com/cylixlee/protobuf-playground/internal/proto"
 	"google.golang.org/grpc"
@@ -27,20 +28,18 @@ func (server) Hello(_ context.Context, req *proto.HelloRequest) (*proto.HelloRes
 
 type rateLimitedServer struct {
 	proto.UnimplementedRateLimitedHelloServer
-	visitors map[string]struct{}
+	visitors sync.Map
 }
 
 func newRateLimitedServer() *rateLimitedServer {
-	return &rateLimitedServer{
-		visitors: make(map[string]struct{}),
-	}
+	return new(rateLimitedServer)
 }
 
 func (r *rateLimitedServer) Hello(_ context.Context, req *proto.HelloRequest) (*proto.HelloResponse, error) {
-	if _, exist := r.visitors[req.Name]; exist {
+	if _, exist := r.visitors.Load(req.Name); exist {
 		return nil, status.Error(codes.AlreadyExists, fmt.Sprintf("User %s already exists", req.Name))
 	}
-	r.visitors[req.Name] = struct{}{}
+	r.visitors.Store(req.Name, struct{}{})
 	return &proto.HelloResponse{Reply: fmt.Sprintf("Hello %s", req.Name)}, nil
 }
 
